@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"net/url"
 )
 
 func main() {
@@ -14,5 +16,14 @@ func main() {
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "hogehoge")
+	q, err := url.ParseQuery(r.URL.RawQuery)
+	if err != nil {
+		log.Fatal(err)
+	}
+	v, ok := q["calory"]
+	if !ok {
+		// TODO: パラメーターの不足はクライアントエラーなのでlog出力してプロセスを終了するのではなく、400を返すようにする
+		log.Fatal("calory param must be present")
+	}
+	fmt.Fprintln(w, v[0])
 }
